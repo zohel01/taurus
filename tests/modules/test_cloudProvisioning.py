@@ -1,18 +1,8 @@
 import json
-import os
-import shutil
-import tempfile
-import time
 
-import yaml
-
-from bzt import TaurusConfigError, TaurusException
-from bzt.bza import Master, Test, MultiTest
-from bzt.engine import ScenarioExecutor, ManualShutdown, Service
-from bzt.modules.aggregator import ConsolidatingAggregator, DataPoint, KPISet
-from bzt.modules.blazemeter import CloudProvisioning, ResultsFromBZA, ServiceStubCaptureHAR
-from bzt.modules.blazemeter import CloudTaurusTest, CloudCollectionTest
-from bzt.utils import get_full_path
+from bzt.engine import ManualShutdown
+from bzt.modules.aggregator import ConsolidatingAggregator
+from bzt.modules.blazemeter import CloudProvisioning
 from tests import BZTestCase, __dir__
 from tests.mocks import EngineEmul, ModuleMock, RecordingHandler
 from tests.modules.test_blazemeter import BZMock
@@ -81,4 +71,3 @@ class TestCloudProvisioning(BZTestCase):
         self.assertIn("Location: harbor-sandbox\tSandbox", info)
 
         self.obj.post_process()
-
