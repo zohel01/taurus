@@ -22,13 +22,7 @@ class TestCloudProvisioning(BZTestCase):
         self.obj.engine = engine
         self.obj.browser_open = False
         self.mock = BZMock(self.obj.user)
-        self.mock.mock_post.update({
-            'https://a.blazemeter.com/api/v4/projects': {"result": {"id": 1}},
-            'https://a.blazemeter.com/api/v4/tests': {"result": {"id": 1}},
-            'https://a.blazemeter.com/api/v4/tests/1/files': {"result": {"id": 1}},
-            'https://a.blazemeter.com/api/v4/tests/1/start': {"result": {"id": 1}},
-            'https://a.blazemeter.com/api/v4/masters/1/stop': {"result": True},
-        })
+        self.mock.mock_post.update({})
 
     def configure(self, engine_cfg=None, get=None, post=None, patch=None, add_config=True, add_settings=True):
         if engine_cfg is None:
