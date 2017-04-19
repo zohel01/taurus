@@ -65,23 +65,6 @@ class TestCloudProvisioning(BZTestCase):
         self.mock.mock_patch.update(patch if patch else {})
         self.mock.mock_patch.update({'https://a.blazemeter.com/api/v4/tests/1': {"result": {}}})
 
-    def test_dump_locations(self):
-        self.configure()
-        log_recorder = RecordingHandler()
-        self.obj.log.addHandler(log_recorder)
-
-        self.obj.settings["dump-locations"] = True
-        self.obj.settings["use-deprecated-api"] = True
-        self.assertRaises(ManualShutdown, self.obj.prepare)
-
-        warnings = log_recorder.warn_buff.getvalue()
-        self.assertIn("Dumping available locations instead of running the test", warnings)
-        info = log_recorder.info_buff.getvalue()
-        self.assertIn("Location: us-west\tDallas (Rackspace)", info)
-        self.assertIn("Location: us-east-1\tEast", info)
-        self.assertNotIn("Location: harbor-sandbox\tSandbox", info)
-        self.obj.post_process()
-
     def test_dump_locations_new_style(self):
         log_recorder = RecordingHandler()
         self.obj.log.addHandler(log_recorder)
@@ -98,69 +81,4 @@ class TestCloudProvisioning(BZTestCase):
         self.assertIn("Location: harbor-sandbox\tSandbox", info)
 
         self.obj.post_process()
-
-    def test_settings_from_blazemeter_mod(self):
-        self.configure(
-            add_settings=False,
-            engine_cfg={
-                ScenarioExecutor.EXEC: {
-                    "executor": "mock",
-                    "concurrency": 5500,
-                    "locations": {
-                        "us-east-1": 1,
-                        "us-west": 1}},
-                "modules": {
-                    "blazemeter": {
-                        "class": ModuleMock.__module__ + "." + ModuleMock.__name__,
-                        "token": "bmtoken",
-                        "detach": True,
-                        "browser-open": None,
-                        "check-interval": 10.0}}},
-        )  # upload files
-
-        # these should override 'blazemeter' settings
-        self.obj.settings["check-interval"] = 20.0
-        self.obj.settings["browser-open"] = "both"
-
-        self.obj.prepare()
-
-        self.assertEqual(self.obj.detach, True)
-        self.assertEqual(self.obj.browser_open, "both")
-        self.assertEqual(self.obj.user.token, "bmtoken")
-        self.assertEqual(self.obj.check_interval, 20.0)
-        self.assertEqual(11, len(self.mock.requests))
-
-    def test_public_report(self):
-        self.configure(
-            engine_cfg={
-                ScenarioExecutor.EXEC: {
-                    "executor": "mock",
-                    "concurrency": 1,
-                    "locations": {
-                        "us-west": 2
-                    }}},
-            post={
-                'https://a.blazemeter.com/api/v4/masters/1/public-token': {"result": {"publicToken": "publicToken"}}
-            },
-            get={
-                'https://a.blazemeter.com/api/v4/masters/1/status': {"result": {"status": "CREATED"}},
-                'https://a.blazemeter.com/api/v4/masters/1/sessions': {"result": {"sessions": []}},
-                'https://a.blazemeter.com/api/v4/masters/1/full': {"result": {}},
-            }
-        )
-
-        log_recorder = RecordingHandler()
-        self.obj.log.addHandler(log_recorder)
-
-        self.obj.settings['public-report'] = True
-        self.obj.prepare()
-        self.obj.startup()
-        self.obj.check()
-        self.obj.shutdown()
-        self.obj.post_process()
-
-        log_buff = log_recorder.info_buff.getvalue()
-        log_line = "Public report link: https://a.blazemeter.com/app/?public-token=publicToken#/masters/1/summary"
-        self.assertIn(log_line, log_buff)
-
 
