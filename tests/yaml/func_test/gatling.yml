@@ -1,8 +1,0 @@
----
-execution:
-- concurrency: 1
-  executor: gatling
-  hold-for: 5
-  scenario:
-    requests:
-      - url:  http://blazedemo.com

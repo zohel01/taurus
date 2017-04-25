@@ -1,9 +1,0 @@
-{
-  "provisioning": "mock",
-  "modules": {
-    "mock": {
-      "class": "tests.mocks.ModuleMock",
-      "check": "tests.mocks.KeyboardInterrupt"
-    }
-  }
-}
