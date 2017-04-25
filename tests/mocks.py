@@ -46,11 +46,7 @@ class BZMock(object):
         :type obj: bzt.bza.BZAObject
         """
         super(BZMock, self).__init__()
-        locs = [{'id': 'aws', 'sandbox': False, 'title': 'AWS'},
-                {'id': 'us-east-1', 'sandbox': False, 'title': 'East'},
-                {'id': 'us-west', 'sandbox': False, 'title': 'Dallas (Rackspace)'},
-                {'id': 'harbor-sandbox', 'sandbox': True, 'title': 'Sandbox'},
-                {'id': 'non-harbor-sandbox', 'sandbox': True, 'title': 'Sandbox Neverexisting'}, ]
+        locs = [{'id': 'aws', 'sandbox': False, 'title': 'AWS'}]
         self.mock_get = {
             'https://a.blazemeter.com/api/v4/web/version': {},
             'https://a.blazemeter.com/api/v4/user': {'defaultProject': {'id': None}},
@@ -94,14 +90,9 @@ class BZMock(object):
 
         response = requests.Response()
 
-        if isinstance(resp, list):
-            resp = resp.pop(0)
-
         data = kwargs['data']
-        logging.debug("Emulated %s %s %s: %s", method, url, data, resp)
         self.requests.append({"method": method, "url": url, "data": data})
-        if isinstance(resp, BaseException):
-            raise resp
+
         response._content = to_json(resp)
         response.status_code = 200
         return response

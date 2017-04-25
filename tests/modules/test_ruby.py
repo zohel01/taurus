@@ -1,6 +1,6 @@
-from tests.modules.test_SeleniumExecutor import SeleniumTestCase
+from tests import BZTestCase
 
 
-class TestR(SeleniumTestCase):
+class TestR(BZTestCase):
     def test_rb(self):
         self.assertEqual(1, 0)
