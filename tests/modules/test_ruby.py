@@ -1,6 +1,6 @@
 from tests.modules.test_SeleniumExecutor import SeleniumTestCase
 
 
-class TestSeleniumRSpecRunner(SeleniumTestCase):
-    def test_selenium_prepare_rspec(self):
+class TestR(SeleniumTestCase):
+    def test_rb(self):
         self.assertEqual(1, 0)

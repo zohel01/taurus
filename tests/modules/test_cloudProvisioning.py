@@ -4,7 +4,7 @@ from bzt.engine import ManualShutdown
 from bzt.modules.aggregator import ConsolidatingAggregator
 from bzt.modules.blazemeter import CloudProvisioning
 from tests import BZTestCase, __dir__
-from tests.mocks import EngineEmul, ModuleMock, RecordingHandler
+from tests.mocks import EngineEmul, ModuleMock
 from tests.modules.test_blazemeter import BZMock
 
 
@@ -50,18 +50,8 @@ class TestCloudProvisioning(BZTestCase):
         self.mock.mock_patch.update({'https://a.blazemeter.com/api/v4/tests/1': {"result": {}}})
 
     def test_dump_locations_new_style(self):
-        log_recorder = RecordingHandler()
-        self.obj.log.addHandler(log_recorder)
         self.configure()
         self.obj.settings["dump-locations"] = True
         self.obj.settings["use-deprecated-api"] = False
         self.assertRaises(ManualShutdown, self.obj.prepare)
-
-        warnings = log_recorder.warn_buff.getvalue()
-        self.assertIn("Dumping available locations instead of running the test", warnings)
-        info = log_recorder.info_buff.getvalue()
-        self.assertIn("Location: us-west\tDallas (Rackspace)", info)
-        self.assertIn("Location: us-east-1\tEast", info)
-        self.assertIn("Location: harbor-sandbox\tSandbox", info)
-
         self.obj.post_process()
