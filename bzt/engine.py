@@ -138,10 +138,10 @@ class Engine(object):
 
     def _startup(self):
         modules = self.services + [self.aggregator] + self.reporters + [self.provisioning]  # order matters
-        for module in modules:
-            self.log.debug("Startup %s", module)
-            self.started.append(module)
-            module.startup()
+        for mod in modules:
+            self.log.debug("Startup %s", mod)
+            self.started.append(mod)
+            mod.startup()
         self.config.dump()
 
     def run(self):
@@ -177,10 +177,10 @@ class Engine(object):
     def _check_modules_list(self):
         finished = False
         modules = [self.provisioning, self.aggregator] + self.services + self.reporters  # order matters
-        for module in modules:
-            if module in self.started:
-                self.log.debug("Checking %s", module)
-                finished |= bool(module.check())
+        for mod in modules:
+            if mod in self.started:
+                self.log.debug("Checking %s", mod)
+                finished |= bool(mod.check())
         return finished
 
     def _wait(self):
@@ -211,10 +211,10 @@ class Engine(object):
         self.log.info("Shutting down...")
         exc_info = None
         modules = [self.provisioning, self.aggregator] + self.reporters + self.services  # order matters
-        for module in modules:
+        for mod in modules:
             try:
-                if module in self.started:
-                    module.shutdown()
+                if mod in self.started:
+                    mod.shutdown()
             except BaseException as exc:
                 self.log.debug("%s:\n%s", exc, traceback.format_exc())
                 if not exc_info:
@@ -233,10 +233,10 @@ class Engine(object):
         exc_info = None
         modules = [self.provisioning, self.aggregator] + self.reporters + self.services  # order matters
         # services are last because of shellexec which is "final-final" action
-        for module in modules:
-            if module in self.prepared:
+        for mod in modules:
+            if mod in self.prepared:
                 try:
-                    module.post_process()
+                    mod.post_process()
                 except BaseException as exc:
                     if isinstance(exc, KeyboardInterrupt):
                         self.log.debug("post_process: %s", exc)
@@ -480,9 +480,9 @@ class Engine(object):
             self.reporters.append(instance)
 
         # prepare reporters
-        for module in self.reporters:
-            self.prepared.append(module)
-            module.prepare()
+        for mod in self.reporters:
+            self.prepared.append(mod)
+            mod.prepare()
 
     def __prepare_services(self):
         """
@@ -500,9 +500,9 @@ class Engine(object):
             if instance.should_run():
                 self.services.append(instance)
 
-        for module in self.services:
-            self.prepared.append(module)
-            module.prepare()
+        for mod in self.services:
+            self.prepared.append(mod)
+            mod.prepare()
 
     def __singletone_exists(self, instance, mods_list):
         if not isinstance(instance, Singletone):
@@ -544,9 +544,9 @@ class Engine(object):
             opener = build_opener(proxy_handler)
             install_opener(opener)
 
-    def _check_updates(self, installID):
+    def _check_updates(self, install_id):
         try:
-            params = (bzt.VERSION, installID)
+            params = (bzt.VERSION, install_id)
             req = "http://gettaurus.org/updates/?version=%s&installID=%s" % params
             self.log.debug("Requesting updates info: %s", req)
             response = urlopen(req, timeout=10)
